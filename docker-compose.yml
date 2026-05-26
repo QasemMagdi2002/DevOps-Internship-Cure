@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    container_name: cure_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cure_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vMvpcWAYPaePV94n6YsLZf}
+      POSTGRES_DB: ${POSTGRES_DB:-cure_db}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - cure_postgres_data:/var/lib/postgresql/data
+    networks:
+      - cure_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cure_app} -d ${POSTGRES_DB:-cure_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: cure_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend/app:/app/app:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cure_internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: cure_frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./frontend/src:/app/src:ro
+      - ./frontend/index.html:/app/index.html:ro
+    depends_on:
+      - backend
+    networks:
+      - cure_internal
+
+networks:
+  cure_internal:
+    driver: bridge
+
+volumes:
+  cure_postgres_data:
