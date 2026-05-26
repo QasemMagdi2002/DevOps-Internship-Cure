@@ -1,0 +1,52 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cure-default-deny-ingress
+  namespace: cure
+  labels:
+    app.kubernetes.io/name: cure-network-policy
+    app.kubernetes.io/part-of: cure-platform
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-alb-to-frontend
+  namespace: cure
+  labels:
+    app.kubernetes.io/name: cure-network-policy
+    app.kubernetes.io/part-of: cure-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cure-frontend
+      app.kubernetes.io/component: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-alb-to-backend
+  namespace: cure
+  labels:
+    app.kubernetes.io/name: cure-network-policy
+    app.kubernetes.io/part-of: cure-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cure-backend
+      app.kubernetes.io/component: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8000

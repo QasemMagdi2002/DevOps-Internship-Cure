@@ -11,7 +11,9 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 def register_user(payload: UserRegister, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == payload.email).first()
+    normalized_email = payload.email.lower()
+
+    existing_user = db.query(User).filter(User.email == normalized_email).first()
 
     if existing_user:
         raise HTTPException(
@@ -21,7 +23,7 @@ def register_user(payload: UserRegister, db: Session = Depends(get_db)):
 
     user = User(
         full_name=payload.full_name.strip(),
-        email=payload.email.lower(),
+        email=normalized_email,
         hashed_password=hash_password(payload.password),
         role="patient",
     )
@@ -41,7 +43,9 @@ def register_user(payload: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def login_user(payload: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == payload.email.lower()).first()
+    normalized_email = payload.email.lower()
+
+    user = db.query(User).filter(User.email == normalized_email).first()
 
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(

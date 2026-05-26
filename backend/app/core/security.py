@@ -18,10 +18,19 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def hash_password(password: str) -> str:
+    if len(password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must not exceed 72 bytes.",
+        )
+
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    if len(plain_password.encode("utf-8")) > 72:
+        return False
+
     return pwd_context.verify(plain_password, hashed_password)
 
 
@@ -75,4 +84,5 @@ def require_admin(current_user: Annotated[User, Depends(get_current_user)]) -> U
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges are required.",
         )
+
     return current_user

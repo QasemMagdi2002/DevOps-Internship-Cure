@@ -23,7 +23,7 @@ class UserRegister(BaseModel):
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=72)
 
 
 class TokenResponse(BaseModel):
@@ -51,7 +51,7 @@ class DoctorResponse(BaseModel):
 
 
 class AppointmentCreate(BaseModel):
-    doctor_id: int
+    doctor_id: int = Field(gt=0)
     appointment_date: datetime
     reason: str = Field(min_length=5, max_length=1000)
 
@@ -69,3 +69,21 @@ class AppointmentResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class DocumentResponse(BaseModel):
+    id: int
+    file_name: str
+    content_type: str
+    uploaded_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class DocumentDownloadResponse(BaseModel):
+    download_url: str
+
+
+class ReadinessResponse(BaseModel):
+    status: str
+    database: str

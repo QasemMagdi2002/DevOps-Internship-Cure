@@ -1,0 +1,50 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: cure-prod-eks
+  region: eu-central-1
+  version: "1.30"
+  tags:
+    project: cure-devops-assessment
+    environment: production
+    owner: qasem
+    managed-by: eksctl
+
+iam:
+  withOIDC: true
+
+vpc:
+  cidr: 10.40.0.0/16
+  nat:
+    gateway: Single
+
+managedNodeGroups:
+  - name: cure-system-ng
+    instanceTypes:
+      - t3.small
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    privateNetworking: true
+    volumeSize: 30
+    volumeEncrypted: true
+    labels:
+      nodegroup: system
+      workload: general
+    tags:
+      project: cure-devops-assessment
+      environment: production
+      nodegroup: cure-system-ng
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+        albIngress: true
+
+addons:
+  - name: vpc-cni
+  - name: coredns
+  - name: kube-proxy
+  - name: aws-ebs-csi-driver

@@ -22,6 +22,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     appointments = relationship("Appointment", back_populates="patient")
+    documents = relationship("MedicalDocument", back_populates="patient")
 
 
 class Doctor(Base):
@@ -49,3 +50,16 @@ class Appointment(Base):
 
     patient = relationship("User", back_populates="appointments")
     doctor = relationship("Doctor", back_populates="appointments")
+
+
+class MedicalDocument(Base):
+    __tablename__ = "medical_documents"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    file_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(120), nullable=False)
+    s3_key: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    patient = relationship("User", back_populates="documents")
