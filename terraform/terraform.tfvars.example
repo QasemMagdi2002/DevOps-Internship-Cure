@@ -1,0 +1,23 @@
+project_name = "cure"
+environment  = "production"
+aws_region   = "eu-central-1"
+owner        = "qasem"
+
+vpc_cidr           = "10.40.0.0/16"
+enable_nat_gateway = true
+
+eks_cluster_version = "1.30"
+node_instance_types = ["t3.small"]
+node_desired_size   = 2
+node_min_size       = 2
+node_max_size       = 5
+
+rds_instance_class    = "db.t3.micro"
+rds_allocated_storage = 20
+rds_multi_az          = false
+
+db_name     = "cure_db"
+db_username = "cure_app"
+
+enable_monitoring      = true
+protect_data_resources = false

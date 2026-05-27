@@ -39,7 +39,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: frontend
-          image: qasem2002/cure-frontend:v1
+          image: qasem2002/cure-frontend:v2
           imagePullPolicy: Always
           ports:
             - name: http

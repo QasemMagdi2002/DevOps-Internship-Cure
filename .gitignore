@@ -13,3 +13,10 @@ build/
 .vscode/
 *.log
 k8s/secret.yaml
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfvars
+!terraform/terraform.tfvars.example
+terraform/terraform.tfvars
